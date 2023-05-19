@@ -1,4 +1,7 @@
 # DurianSystem
+This app is an durian system which allows different parties like Durian Farm worker , Distributer , Retailer and customers
+to buy durian , distribute durian , register durian , purchase durian and review durian in the same platform using solidity .
+
 This system is using ganache , metamask and also node. 
 
 Steps to run this project:
@@ -12,5 +15,4 @@ Steps to run this project:
 8. Connected the metamask account to the server
 9. Then the steps is finnished ! enjoy
 
-This app is an durian system which allows different parties like Durian Farm worker , Distributer , Retailer and customers
-to buy durian , distribute durian , register durian , purchase durian and review durian in the same platform using solidity .
+
