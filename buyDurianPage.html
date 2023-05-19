@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distributor</title>
+    <link rel="stylesheet" type="text/css" href="css/styleDis.css">  
+    <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+
+    <script>
+		
+
+		let account;
+		window.onload = function () {
+			accessToContract();
+			accessToMetamask();
+		}
+
+
+		const accessToMetamask = async () => {
+			if (window.ethereum !== "undefined") {
+				const accounts = await ethereum.request({
+					method: "eth_requestAccounts"
+				});
+				account = accounts[0];
+				//check the address which position is the user 
+				
+
+				var data = await window.contract.methods.searchUser(account).call();
+
+				document.getElementById("accountArea").innerHTML = account;
+				
+				
+
+				document.getElementById("accountPos").innerHTML = await window.contract.methods.getPositionToString(data[0]).call();
+
+			}
+		}
+
+		//2- connect to smart contract
+        const accessToContract = async () => {
+            //change this ABIchange
+            const ABI =[
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_durianType",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_durianFarm",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_durianTree",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_qty",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_price",
+				"type": "uint256"
+			}
+		],
+		"name": "addDurian",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_durianID",
+				"type": "string"
+			},
+			{
+				"internalType": "address",
+				"name": "_buyerAddress",
+				"type": "address"
+			}
+		],
+		"name": "addPurchase",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_durianID",
+				"type": "string"
+			},
+			{
+				"internalType": "address",
+				"name": "_customerAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_qty",
+				"type": "uint256"
+			}
+		],
+		"name": "addPurchaseCustomer",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "purchaseID",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_rating",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "desc",
+				"type": "string"
+			}
+		],
+		"name": "addReview",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_userAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "pos",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			}
+		],
+		"name": "addUser",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_durianID",
+				"type": "string"
+			}
+		],
+		"name": "buyDurian",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "number",
+				"type": "uint256"
+			}
+		],
+		"name": "checkDurianState",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_durianID",
+				"type": "string"
+			},
+			{
+				"internalType": "address",
+				"name": "newOwnership",
+				"type": "address"
+			}
+		],
+		"name": "listDurianToSell",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_durianID",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_newState",
+				"type": "uint256"
+			}
+		],
+		"name": "setDurianStateByDurianID",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "userInputID",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_durianType",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_durianFarm",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_durianTree",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_qty",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_price",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "newAddress",
+				"type": "address"
+			}
+		],
+		"name": "updateDurian",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_purchaseID",
+				"type": "string"
+			},
+			{
+				"internalType": "address",
+				"name": "_retailAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_newPrice",
+				"type": "uint256"
+			}
+		],
+		"name": "updatePurchase",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_userAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "pos",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			}
+		],
+		"name": "updateUser",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_userAddress",
+				"type": "address"
+			}
+		],
+		"name": "checkDuplicateUser",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "durian",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "durianID",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "durianType",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "durianFarm",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "durianTree",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "qty",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			},
+			{
+				"internalType": "enum myDurianContract.DurianState",
+				"name": "durianState",
+				"type": "uint8"
+			},
+			{
+				"internalType": "address",
+				"name": "ownership",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "durianRec",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "valueEther",
+				"type": "uint256"
+			}
+		],
+		"name": "etherToWei",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_durianID",
+				"type": "string"
+			}
+		],
+		"name": "getDurianData",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "durianID",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "durianType",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "durianFarm",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "durianTree",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "qty",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "price",
+						"type": "uint256"
+					},
+					{
+						"internalType": "enum myDurianContract.DurianState",
+						"name": "durianState",
+						"type": "uint8"
+					},
+					{
+						"internalType": "address",
+						"name": "ownership",
+						"type": "address"
+					}
+				],
+				"internalType": "struct myDurianContract.Durian",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getDurianTotal",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_userAddress",
+				"type": "address"
+			}
+		],
+		"name": "getPositionByUserID",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "getPositionToString",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_purchaseID",
+				"type": "string"
+			}
+		],
+		"name": "getPurchaseData",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "purchaseID",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "purchaseTime",
+						"type": "uint256"
+					},
+					{
+						"components": [
+							{
+								"internalType": "string",
+								"name": "durianID",
+								"type": "string"
+							},
+							{
+								"internalType": "string",
+								"name": "durianType",
+								"type": "string"
+							},
+							{
+								"internalType": "string",
+								"name": "durianFarm",
+								"type": "string"
+							},
+							{
+								"internalType": "string",
+								"name": "durianTree",
+								"type": "string"
+							},
+							{
+								"internalType": "uint256",
+								"name": "qty",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "price",
+								"type": "uint256"
+							},
+							{
+								"internalType": "enum myDurianContract.DurianState",
+								"name": "durianState",
+								"type": "uint8"
+							},
+							{
+								"internalType": "address",
+								"name": "ownership",
+								"type": "address"
+							}
+						],
+						"internalType": "struct myDurianContract.Durian",
+						"name": "durian",
+						"type": "tuple"
+					},
+					{
+						"internalType": "address",
+						"name": "buyerAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "bool",
+						"name": "retailGet",
+						"type": "bool"
+					},
+					{
+						"internalType": "address",
+						"name": "retailAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "reviewID",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "reviewDescription",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "rating",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct myDurianContract.Purchase",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_purchaseID",
+				"type": "string"
+			}
+		],
+		"name": "getPurchaseDurianData",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "durianID",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "durianType",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "durianFarm",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "durianTree",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "qty",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "price",
+						"type": "uint256"
+					},
+					{
+						"internalType": "enum myDurianContract.DurianState",
+						"name": "durianState",
+						"type": "uint8"
+					},
+					{
+						"internalType": "address",
+						"name": "ownership",
+						"type": "address"
+					}
+				],
+				"internalType": "struct myDurianContract.Durian",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getPurchaseLength",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "length",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "getUserAddressByIndex",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getUserLength",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "length",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_durianID",
+				"type": "string"
+			}
+		],
+		"name": "isDurianInFarm",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address payable",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "purchaseList",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "purchaseID",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "purchaseTime",
+				"type": "uint256"
+			},
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "durianID",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "durianType",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "durianFarm",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "durianTree",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "qty",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "price",
+						"type": "uint256"
+					},
+					{
+						"internalType": "enum myDurianContract.DurianState",
+						"name": "durianState",
+						"type": "uint8"
+					},
+					{
+						"internalType": "address",
+						"name": "ownership",
+						"type": "address"
+					}
+				],
+				"internalType": "struct myDurianContract.Durian",
+				"name": "durian",
+				"type": "tuple"
+			},
+			{
+				"internalType": "address",
+				"name": "buyerAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "bool",
+				"name": "retailGet",
+				"type": "bool"
+			},
+			{
+				"internalType": "address",
+				"name": "retailAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "reviewID",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "reviewDescription",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "rating",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "durianIDinput",
+				"type": "string"
+			}
+		],
+		"name": "searchDurianIndex",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "purchaseID",
+				"type": "string"
+			}
+		],
+		"name": "searchPurchaseIndex",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_userAddress",
+				"type": "address"
+			}
+		],
+		"name": "searchUser",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "enum myDurianContract.Position",
+						"name": "position",
+						"type": "uint8"
+					},
+					{
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "userID",
+						"type": "string"
+					}
+				],
+				"internalType": "struct myDurianContract.User",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "searchUserByIndex",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "enum myDurianContract.Position",
+						"name": "position",
+						"type": "uint8"
+					},
+					{
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "userID",
+						"type": "string"
+					}
+				],
+				"internalType": "struct myDurianContract.User",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "userAddressArray",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "userList",
+		"outputs": [
+			{
+				"internalType": "enum myDurianContract.Position",
+				"name": "position",
+				"type": "uint8"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "userID",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+
+            //change this addressChange
+            const Address = "0xFa88b37A05E4c8C867448F1b71f0Dfb31deFe06C";
+            
+            window.web3 = await new Web3(window.ethereum); //how to access to smart contract 
+            window.contract = await new window.web3.eth.Contract( ABI, Address); //how you create an instance of that contract by using the abi and address  
+            document.getElementById("contractArea").innerHTML = "connected to Product smart contract";
+        }
+
+
+		//buy Durian from the durian Farm
+		const BuyerBuyProduct = async () =>{
+		//need to retrieve product data from the contract
+		const data = await window.contract.methods.getInitialProduct().call();
+		const price = data[1]; 
+		const ownerAddress = data[2];
+		await window.contract.methods.buyProduct(ownerAddress).send({from: account, value:price });  
+		}
+
+		const buyDurian = async(index)=>{
+        //get the quantity user want to buy 
+		var qty = document.getElementById("QtyBuy"+index).value;
+		console.log("qty is"+qty)
+
+		//Buy Durian
+			var durianID = "D" + index ;
+			//get durian data
+			var data = await window.contract.methods.getDurianData(durianID).call();
+
+			//need to convert the price to wei because msg.value is accepting wei 
+			var price = await window.contract.methods.etherToWei(data[5]).call(); 
+
+            price = price*parseInt(qty);
+	
+			await window.contract.methods.buyDurian(durianID).send({from: account, value:price });  
+
+		//add new purchase data
+			await window.contract.methods.addPurchaseCustomer(durianID,account,qty).send({from: account });
+
+			//auto reload the page , so the old data will be updaated
+			
+			console.log("End"+qty)
+		}
+
+		const getAllDurianFromFarm = async() => { 
+			//get all durian from farm 
+			//display all the durian 
+
+			const durianLength = await window.contract.methods.getDurianTotal().call();
+			var row=``;
+
+
+			for(var i = 1 ; i < parseInt(durianLength)+Number(1) ; i++){
+				var localDurianID = "D"+i;
+				var data = await window.contract.methods.getDurianData(localDurianID).call();
+
+				var localDurianState = String(`${await window.contract.methods.checkDurianState(data[6]).call()}`);
+				
+				if(localDurianState==="RETAILER"){
+                    //get retail store name 
+                     const user = await window.contract.methods.searchUser(data[7]).call()
+
+
+					console.log("Only print those in retailer")
+		
+                    var row = row + `<div class="product-box">
+                    <img src="images/${data[1]}.png" alt="" class="product-img">
+                    </br>
+                        <h2 class="product-title">${data[1]}</h2>
+                        <span class="ownership"><br>DurianID : ${data[0]}</span><br>
+                        <span class="qty"><br>Qty :${data[4]}</span><br>
+                        <span class="farm"><br>Farm : ${data[2]}</span><br>
+                        <span class="price">${data[5]} ether</span><br>
+                        <span class="ownership">Ownership : ${user[1]}</span><br>
+
+						Quantity Purchase :
+                        <input type="number" id="QtyBuy${i}" class="form-control">
+                        <br>
+                        <button class="buy" onclick="buyDurian(${i})">BUY</button>
+                    </div>`;
+				
+				}
+
+				document.getElementById("durianBox").innerHTML=row;
+			}
+		}
+
+
+		
+		</script>
+</head>
+<body>
+    <header>
+        <div class="nav container">
+            <form method="POST" action="/manageUser.html"><li><input type="submit" value="Manage User" style="width: 175px;height: 30px;background-color:black;border: none;color: white;margin-left: 20px;margin-top: 10px;border-radius: 5px;" /></li></form>
+			<form method="POST" action="/manageDurian.html"><li><input type="submit" value="Durian Farm" style="width: 175px;height: 30px;background-color:black;border: none;color: white; margin-left: 10px;margin-top: 10px;border-radius: 5px;"/></li></form>
+			<form method="POST" action="/distributor.html"><li><input type="submit" value="Distribution Center" style="width: 175px;height: 30px;background-color:black;border: none;color: white;margin-left: 10px;margin-top: 10px;border-radius: 5px;"/></li></form>
+			<form method="POST" action="/retailer.html"><li><input type="submit" value="Retailer" style="width: 175px;height: 30px;background-color:black;border: none;color: white;margin-left: 10px;margin-top: 10px;border-radius: 5px;"/></li></form>
+			<form method="POST" action="/buyDurianPage.html"><li><input type="submit" value="Durian Market" style="width: 175px;height: 30px;background-color:black;border: none;color: white;margin-left: 10px;margin-top: 10px;border-radius: 5px;"/></li></form>
+            <form method="POST" action="/review.html"><li><input type="submit" value="All Review Page" style="width: 175px;height: 30px;background-color:black;border: none;color: white;margin-left: 10px;margin-top: 10px;border-radius: 5px;"/></li></form>
+        </div>
+    </header>
+
+    <section class="shop container" style="width: 70%; height: 60%;">
+        <h2 class="section-title"><b>Durian Marketplace</b></h2>
+	
+		<div style="width:fit-content;display: flex; margin-left: 250px;padding-bottom: 20px;">
+			<div>
+				<form method="POST" action="/history.html" ><button style="background-color: #4CAF50;; color:white; border: none; height: 30px; width: 230px; border-radius: 5px; margin-bottom: 20px; margin-left: 20px;" onclick="">Purchae History</button></form>
+			</div>
+			<div style="margin-left: 50px;">
+				<button style="background-color: #4CAF50;; color:white; border: none; height: 30px; width: 230px; border-radius: 5px; margin-bottom: 15px; margin-left: 20px;"onclick="getAllDurianFromFarm()">Get all durian records</button>
+			</div>
+		</div>
+        <div class="shop-content" id="durianBox">
+            
+            
+        </div>
+    </section>
+
+
+    <br>
+				<button onclick="accessToMetamask()" class="btn btn-success">Connect Metamask</button> <br>
+				<p id="accountArea"></p>
+				<br>
+
+				<button onclick="accessToContract()" class="btn btn-warning">Connect to Smart Contract</button> <br>
+				<p id="contractArea"></p>
+				<br>
+</body>
+</html>
